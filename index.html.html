@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Ultimate Xi Quach & Anh Quy Quiz</title>
+    <style>
+        /* --- GLOBAL STYLES & GAMING AESTHETIC --- */
+        :root {
+            --bg-color: #0d0e15;
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #39ff14;
+            --neon-red: #ff073a;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at top right, #1a1c29, #0d0e15);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* GLASSMORPHISM UTILITY */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        /* --- 18+ MODAL --- */
+        #age-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .modal-content {
+            text-align: center;
+            max-width: 500px;
+            padding: 40px;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid var(--neon-red);
+            box-shadow: 0 0 20px var(--neon-red);
+        }
+
+        .modal-content h1 {
+            color: var(--neon-red);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .modal-content p {
+            margin-bottom: 30px;
+            color: #ccc;
+            font-size: 1.1rem;
+        }
+
+        .modal-btn {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-yes { background: var(--neon-blue); color: #000; }
+        .btn-yes:hover { box-shadow: 0 0 15px var(--neon-blue); transform: scale(1.05); }
+        
+        .btn-no { background: var(--glass-bg); color: #fff; border: 1px solid var(--glass-border); }
+        .btn-no:hover { background: #333; transform: scale(1.05); }
+
+        /* --- NO SCENARIO SCREEN --- */
+        #underage-screen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #ff69b4;
+            color: #fff;
+            text-align: center;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        
+        .bouncing-text {
+            font-size: 3rem;
+            font-weight: bold;
+            animation: bounce 1s infinite alternate;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        /* --- MAIN WEBSITE --- */
+        #main-content {
+            display: none;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .sound-toggle {
+            background: transparent;
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 5px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            text-align: center;
+            padding: 50px 0;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--neon-pink);
+            text-shadow: 0 0 10px var(--neon-pink);
+            margin-bottom: 10px;
+        }
+
+        /* HIDDEN LORE SECTIONS INITIALLY */
+        #lore-sections {
+            display: none;
+        }
+
+        .profile-img-container {
+            width: 200px;
+            height: 200px;
+            margin: 30px auto;
+            border-radius: 50%;
+            padding: 5px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
+            animation: spinBg 4s linear infinite;
+        }
+
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--bg-color);
+        }
+
+        .floating-emojis { font-size: 2rem; letter-spacing: 15px; margin-top: 20px; }
+
+        /* SECTIONS */
+        section { margin-bottom: 50px; }
+        h2 { 
+            color: var(--neon-blue); 
+            margin-bottom: 20px; 
+            text-align: center; 
+            font-size: 2rem;
+            text-shadow: 0 0 5px var(--neon-blue);
+        }
+
+        /* INTEREST CARDS */
+        .interests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .interest-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .interest-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 15px var(--neon-pink);
+            border-color: var(--neon-pink);
+        }
+
+        .interest-card h3 { margin-bottom: 10px; display: flex; align-items: center; gap: 10px;}
+
+        /* LORE STATS */
+        .stat-bar-container { margin-bottom: 15px; }
+        .stat-label { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold; }
+        .stat-bar { height: 20px; background: #222; border-radius: 10px; overflow: hidden; border: 1px solid #444; }
+        .stat-fill { height: 100%; background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink)); }
+
+        /* QUIZ SECTION */
+        .quiz-container { text-align: center; }
+        #progress-text { font-weight: bold; margin-bottom: 10px; color: var(--neon-blue); }
+        .progress-track { width: 100%; height: 10px; background: #222; border-radius: 5px; margin-bottom: 30px; }
+        #progress-bar { height: 100%; width: 0%; background: var(--neon-green); transition: width 0.3s ease; border-radius: 5px;}
+        
+        #question-text { font-size: 1.5rem; margin-bottom: 30px; }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background: var(--glass-bg);
+            color: #fff;
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--neon-blue); }
+        .option-btn.correct { background: var(--neon-green); color: #000; box-shadow: 0 0 15px var(--neon-green); border-color: var(--neon-green); }
+        .option-btn.wrong { background: var(--neon-red); color: #fff; box-shadow: 0 0 15px var(--neon-red); border-color: var(--neon-red); }
+
+        #reaction-text {
+            min-height: 40px;
+            margin-top: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: all 0.3s;
+        }
+
+        /* LORE UNLOCK SCREEN */
+        #unlock-screen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            color: #fff;
+            text-align: center;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1500;
+        }
+        .unlock-text {
+            font-size: 4rem;
+            color: var(--neon-pink);
+            text-shadow: 0 0 20px var(--neon-pink);
+            animation: popIn 0.5s ease-out;
+            margin-bottom: 20px;
+        }
+        .unlock-icon {
+            font-size: 6rem;
+            animation: bounce 1s infinite alternate;
+        }
+
+        /* RESULTS SCREEN */
+        #results-screen { display: none; text-align: center; padding: 50px 0;}
+        #final-score { font-size: 4rem; color: var(--neon-pink); text-shadow: 0 0 20px var(--neon-pink); margin: 20px 0; }
+        #rank-title { font-size: 2.5rem; color: var(--neon-blue); margin-bottom: 10px; }
+        #rank-desc { font-size: 1.2rem; color: #ccc; margin-bottom: 40px; }
+        
+        .play-again-btn {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: var(--neon-pink);
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--neon-pink);
+            transition: transform 0.2s;
+        }
+        .play-again-btn:hover { transform: scale(1.05); }
+
+        footer { text-align: center; padding: 30px; border-top: 1px solid var(--glass-border); color: #777; margin-top: 50px; }
+        footer p { margin-bottom: 5px; }
+
+        /* ANIMATIONS */
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes spinBg { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-20px); } }
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 5px var(--neon-green); }
+            50% { box-shadow: 0 0 20px var(--neon-green); }
+            100% { box-shadow: 0 0 5px var(--neon-green); }
+        }
+        
+        .shake-animation { animation: shake 0.4s; }
+        .glitch-animation { animation: glitch 0.3s; }
+        .pulse-animation { animation: pulseGlow 1s infinite; }
+
+        /* CONFETTI / PARTICLES */
+        .particle {
+            position: fixed;
+            z-index: 9999;
+            pointer-events: none;
+            animation: fall linear forwards;
+        }
+        .falling-emoji {
+            font-size: 2rem;
+            position: fixed;
+            z-index: 9999;
+            pointer-events: none;
+            animation: fallAndSpin linear forwards;
+        }
+        
+        @keyframes fall { 
+            0% { transform: translateY(-10px) rotate(0deg); opacity: 1;} 
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0;} 
+        }
+        @keyframes fallAndSpin {
+            0% { transform: translateY(-10vh) rotate(0deg) scale(0.5); opacity: 1;} 
+            100% { transform: translateY(100vh) rotate(1080deg) scale(1.5); opacity: 0;} 
+        }
+
+        /* FLYING TEXT FOR WRONG ANSWERS */
+        .flying-text {
+            position: fixed;
+            color: var(--neon-red);
+            font-size: 3rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 0 #000;
+            z-index: 9999;
+            pointer-events: none;
+            animation: flyAcross 1s ease-out forwards;
+        }
+        @keyframes flyAcross {
+            0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+            100% { transform: translate(100vw, -50vh) scale(2); opacity: 0; }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.2rem; }
+            .options-grid { grid-template-columns: 1fr; }
+            .modal-content { width: 90%; padding: 20px; }
+            .bouncing-text, .unlock-text { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- AUDIO ELEMENTS -->
+    <audio id="sfx-correct-1" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+    <audio id="sfx-correct-2" src="https://assets.mixkit.co/active_storage/sfx/2017/2017-preview.mp3"></audio>
+    <audio id="sfx-correct-3" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
+    
+    <audio id="sfx-wrong-1" src="https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3"></audio>
+    <audio id="sfx-wrong-2" src="https://assets.mixkit.co/active_storage/sfx/2004/2004-preview.mp3"></audio>
+    <audio id="sfx-wrong-3" src="https://assets.mixkit.co/active_storage/sfx/1997/1997-preview.mp3"></audio>
+
+    <audio id="sfx-unlock" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+
+
+    <!-- 18+ MODAL -->
+    <div id="age-modal">
+        <div class="modal-content glass-card">
+            <h1>🚨 BEFORE ENTERING… 🚨</h1>
+            <p>ARE YOU 18+?</p>
+            <p style="font-size: 0.9rem;">"This website contains silly blurry meme-style content and chaotic humor. Are you 18 or older?"</p>
+            <button class="modal-btn btn-yes" onclick="enterSite()">YES, I'M 18+ 😎</button>
+            <button class="modal-btn btn-no" onclick="rejectUser()">NO 😭</button>
+        </div>
+    </div>
+
+    <!-- UNDERAGE SCREEN -->
+    <div id="underage-screen">
+        <div class="bouncing-text">GOOD CHOICE BRO 😭</div>
+        <p style="font-size: 1.5rem; margin-bottom: 30px; max-width: 80%;">You have been protected from the forbidden Xi Quach lore.</p>
+        <div style="font-size: 4rem; margin-bottom: 30px;">💃🕺🥳🦆🗿</div>
+        <button class="modal-btn btn-no" style="background:#fff; color:#000;" onclick="location.reload()">OKAY, TAKE ME HOME 💀</button>
+    </div>
+    
+    <!-- UNLOCK SCREEN -->
+    <div id="unlock-screen">
+        <div class="unlock-icon">🔓</div>
+        <div class="unlock-text">QUY LORE UNLOCKED</div>
+    </div>
+
+    <!-- MAIN WEBSITE -->
+    <div id="main-content">
+        <header>
+            <div style="font-weight: bold; color: var(--neon-blue);">XI QUACH ARCHIVES</div>
+            <button class="sound-toggle" onclick="toggleSound()" id="sound-btn">🔊 Sound: ON</button>
+        </header>
+
+        <div class="hero">
+            <h1>THE ULTIMATE XI QUACH & ANH QUY QUIZ</h1>
+        </div>
+
+        <!-- QUIZ SECTION (SHOWN FIRST) -->
+        <section class="glass-card quiz-container" id="quiz-section">
+            <h2>🔥 HOW WELL DO YOU KNOW QUY? 🔥</h2>
+            
+            <div id="progress-text">QUESTION 1 / 10</div>
+            <div class="progress-track">
+                <div id="progress-bar"></div>
+            </div>
+
+            <div id="question-text">Loading question...</div>
+            
+            <div class="options-grid" id="options-grid">
+                <!-- Buttons injected via JS -->
+            </div>
+
+            <div id="reaction-text"></div>
+        </section>
+
+        <!-- LORE SECTIONS (HIDDEN UNTIL QUIZ COMPLETE) -->
+        <div id="lore-sections">
+            <section class="glass-card">
+                <h2>WHO IS QUY?</h2>
+                <div class="profile-img-container">
+                    <img src="https://via.placeholder.com/200/333/fff?text=Upload+Quy+Pic" alt="Quy" class="profile-img" id="quy-pic">
+                </div>
+                <div class="floating-emojis" style="text-align: center; margin-bottom: 30px;">🎮 🔥 😂 🗿 🍖 🦆 ⭐</div>
+
+                <p style="text-align: center; margin-bottom: 30px; font-size: 1.1rem; color: #ccc;">
+                    Quy is a legendary character of questionable levels of chaos. He enjoys gaming, food, memes, and anything that contributes to the lore.
+                </p>
+                
+                <div class="interests-grid">
+                    <div class="interest-card glass-card">
+                        <h3>🎮 Free Fire</h3>
+                        <p>If there is a game to play, Quy is probably already playing Free Fire.</p>
+                    </div>
+                    <div class="interest-card glass-card">
+                        <h3>☀️ Sophie Sun</h3>
+                        <p>One of the most important pieces of the lore.</p>
+                    </div>
+                    <div class="interest-card glass-card">
+                        <h3>🍖 Xi Quach</h3>
+                        <p>A Vietnamese food that he absolutely loves.</p>
+                    </div>
+                    <div class="interest-card glass-card">
+                        <h3>🦆 Vich Chinh</h3>
+                        <p>His legendary favorite meal — a fictional food made from duck.</p>
+                    </div>
+                    <div class="interest-card glass-card">
+                        <h3>😂 Blurry Memes</h3>
+                        <p>Enjoys funny, intentionally blurry meme-style content.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="glass-card">
+                <h2>THE ANH QUY LORE</h2>
+                <p style="text-align: center; margin-bottom: 20px;">
+                    "Welcome to the world of Anh Quy. This is where gaming, food, memes, and completely unnecessary levels of lore come together."
+                </p>
+                
+                <div class="stat-bar-container">
+                    <div class="stat-label"><span>FREE FIRE</span><span>100%</span></div>
+                    <div class="stat-bar"><div class="stat-fill" style="width: 100%;"></div></div>
+                </div>
+                <div class="stat-bar-container">
+                    <div class="stat-label"><span>MEME ENERGY</span><span>110%</span></div>
+                    <div class="stat-bar"><div class="stat-fill" style="width: 100%; background: linear-gradient(90deg, #ff0, #f00);"></div></div>
+                </div>
+                <div class="stat-bar-container">
+                    <div class="stat-label"><span>FOOD ENTHUSIASM</span><span>100%</span></div>
+                    <div class="stat-bar"><div class="stat-fill" style="width: 100%; background: linear-gradient(90deg, #0f0, #00f);"></div></div>
+                </div>
+                <div class="stat-bar-container">
+                    <div class="stat-label"><span>CHAOS</span><span>999%</span></div>
+                    <div class="stat-bar"><div class="stat-fill" style="width: 100%; background: linear-gradient(90deg, #f0f, #f00); box-shadow: 0 0 10px #f00;"></div></div>
+                </div>
+            </section>
+
+            <!-- RESULTS SECTION (SHOWN AT END OF LORE) -->
+            <section class="glass-card" id="results-screen">
+                <h2>🏆 YOUR LORE SCORE 🏆</h2>
+                <div id="final-score">0 / 10</div>
+                <div id="rank-title">NPC LEVEL 💀</div>
+                <div id="rank-desc">"You have discovered approximately 2% of the lore."</div>
+                <button class="play-again-btn" onclick="location.reload()">PLAY AGAIN 🔄</button>
+            </section>
+        </div>
+
+        <footer>
+            <p>Made for maximum Xi Quach & Anh Quy lore. 🗿🔥</p>
+            <p>© 2026 — The Xi Quach Lore Archives</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- STATE & CONFIG ---
+        let soundEnabled = true;
+        let currentQuestion = 0;
+        let score = 0;
+        let isAnswering = false;
+
+        const correctReactions = [
+            "🔥 CORRECT!", 
+            "🗿 BRO KNOWS THE LORE", 
+            "🎬 ABSOLUTE CINEMA", 
+            "+1000 ANH QUY KNOWLEDGE", 
+            "🧠 GALAXY BRAIN ACTIVATED",
+            "🏆 THE LORE MASTER HAS ARRIVED"
+        ];
+
+        const wrongReactions = [
+            "💀 HOW DID YOU MISS THAT?", 
+            "😭 THE LORE HAS BEEN LOST", 
+            "🗿 QUY IS DISAPPOINTED", 
+            "💀 -500 BRAIN CELLS", 
+            "🚨 LORE FAILURE 🚨",
+            "😭 BRO NEEDS TO LOCK IN"
+        ];
+        
+        const correctSounds = ['sfx-correct-1', 'sfx-correct-2', 'sfx-correct-3'];
+        const wrongSounds = ['sfx-wrong-1', 'sfx-wrong-2', 'sfx-wrong-3'];
+
+        // --- QUIZ DATA ---
+        const questions = [
+            { q: "What game does Quy love?", options: ["Minecraft", "Roblox", "Free Fire", "FIFA"], ans: 2 },
+            { q: "What food does Quy love?", options: ["Pizza", "Sushi", "Xi Quach / xí quách", "Ice cream"], ans: 2 },
+            { q: "Who does Quy love?", options: ["Batman", "Shrek", "Sophie Sun", "Mario"], ans: 2 },
+            { q: "What is Quy's favorite meal?", options: ["Pizza", "Vich Chinh", "Sushi", "Fried rice"], ans: 1 },
+            { q: "What level of Meme Energy does Anh Quy possess?", options: ["10%", "50%", "110%", "0%"], ans: 2 },
+            { q: "If Quy is not eating, what is he most likely doing?", options: ["Studying", "Sleeping", "Grinding Free Fire", "Cleaning"], ans: 2 },
+            { q: "Which of these best describes Vich Chinh?", options: ["A beef soup", "A fictional food made from duck", "A type of cake", "A spicy noodle dish"], ans: 1 },
+            { q: "What kind of content does Quy enjoy most?", options: ["4K documentary footage", "Blurry meme-style content", "Romantic comedies", "Cooking tutorials"], ans: 1 },
+            { q: "How much Chaos is documented in the Anh Quy Lore?", options: ["10%", "100%", "999%", "50%"], ans: 2 },
+            { q: "What is the ultimate purpose of this website?", options: ["To sell shoes", "To teach math", "Maximum Xi Quach & Anh Quy lore", "To share recipes"], ans: 2 }
+        ];
+
+        // --- FUNCTIONS ---
+        function playRandomSound(soundArray) {
+            if (!soundEnabled) return;
+            const randomSoundId = soundArray[Math.floor(Math.random() * soundArray.length)];
+            const audio = document.getElementById(randomSoundId);
+            if (audio) {
+                audio.currentTime = 0;
+                audio.play().catch(e => console.log("Audio play prevented"));
+            }
+        }
+        
+        function playSpecificSound(id) {
+            if (!soundEnabled) return;
+            const audio = document.getElementById(id);
+            if (audio) {
+                audio.currentTime = 0;
+                audio.play().catch(e => console.log("Audio play prevented"));
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('sound-btn').innerText = soundEnabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
+        }
+
+        function enterSite() {
+            document.getElementById('age-modal').style.opacity = '0';
+            playRandomSound(correctSounds);
+            setTimeout(() => {
+                document.getElementById('age-modal').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                loadQuestion();
+            }, 500);
+        }
+
+        function rejectUser() {
+            document.getElementById('age-modal').style.display = 'none';
+            document.getElementById('underage-screen').style.display = 'flex';
+            playRandomSound(wrongSounds);
+            fireEmojis(['💃', '🕺', '🥳', '🦆', '🗿'], 30);
+        }
+
+        function loadQuestion() {
+            isAnswering = false;
+            const qData = questions[currentQuestion];
+            
+            document.getElementById('progress-text').innerText = `QUESTION ${currentQuestion + 1} / ${questions.length}`;
+            document.getElementById('progress-bar').style.width = `${((currentQuestion) / questions.length) * 100}%`;
+            document.getElementById('question-text').innerText = qData.q;
+            
+            const reactionEl = document.getElementById('reaction-text');
+            reactionEl.innerText = "";
+            reactionEl.className = "";
+            
+            document.body.classList.remove('glitch-animation');
+
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = "";
+            
+            qData.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => selectAnswer(index, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function selectAnswer(selectedIndex, btnElement) {
+            if (isAnswering) return;
+            isAnswering = true;
+
+            const qData = questions[currentQuestion];
+            const isCorrect = (selectedIndex === qData.ans);
+            const reactionEl = document.getElementById('reaction-text');
+
+            if (isCorrect) {
+                btnElement.classList.add('correct');
+                btnElement.classList.add('pulse-animation');
+                score++;
+                
+                reactionEl.innerText = correctReactions[Math.floor(Math.random() * correctReactions.length)];
+                reactionEl.style.color = "var(--neon-green)";
+                reactionEl.style.textShadow = "0 0 15px var(--neon-green)";
+                reactionEl.style.transform = "scale(1.2)";
+                
+                playRandomSound(correctSounds);
+                
+                const effect = Math.random();
+                if (effect < 0.3) fireParticles(20, ['#39ff14', '#00f3ff']);
+                else if (effect < 0.6) fireEmojis(['🔥', '⭐', '🧠', '🏆'], 15);
+                else {
+                    fireParticles(10, ['#39ff14']);
+                    fireEmojis(['W'], 5);
+                }
+
+            } else {
+                btnElement.classList.add('wrong');
+                btnElement.classList.add('shake-animation');
+                
+                document.querySelectorAll('.option-btn')[qData.ans].classList.add('correct');
+                
+                reactionEl.innerText = wrongReactions[Math.floor(Math.random() * wrongReactions.length)];
+                reactionEl.style.color = "var(--neon-red)";
+                reactionEl.style.textShadow = "0 0 15px var(--neon-red)";
+                
+                playRandomSound(wrongSounds);
+                
+                const effect = Math.random();
+                if (effect < 0.3) {
+                    document.body.classList.add('glitch-animation');
+                    setTimeout(() => document.body.classList.remove('glitch-animation'), 300);
+                }
+                else if (effect < 0.6) fireEmojis(['💀', '😭', '🚨', '📉'], 10);
+                else showFlyingText("BRUH");
+            }
+
+            setTimeout(() => {
+                reactionEl.style.transform = "scale(1)";
+                currentQuestion++;
+                if (currentQuestion < questions.length) {
+                    loadQuestion();
+                } else {
+                    triggerLoreUnlock();
+                }
+            }, 2500);
+        }
+
+        function triggerLoreUnlock() {
+            document.getElementById('quiz-section').style.display = 'none';
+            const unlockScreen = document.getElementById('unlock-screen');
+            unlockScreen.style.display = 'flex';
+            
+            playSpecificSound('sfx-unlock');
+            fireParticles(100, ['#ff00ff', '#00f3ff', '#39ff14', '#ff073a', '#ffff00']);
+            fireEmojis(['🔓', '🔥', '🗿', '🦆', '✨'], 30);
+            
+            setTimeout(() => {
+                unlockScreen.style.opacity = '0';
+                setTimeout(() => {
+                    unlockScreen.style.display = 'none';
+                    revealLore();
+                }, 500);
+            }, 3000);
+        }
+
+        function revealLore() {
+            document.getElementById('lore-sections').style.display = 'block';
+            
+            document.getElementById('results-screen').style.display = 'block';
+            document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
+
+            const titleEl = document.getElementById('rank-title');
+            const descEl = document.getElementById('rank-desc');
+
+            if (score <= 3) {
+                titleEl.innerText = "NPC LEVEL 💀";
+                titleEl.style.color = "var(--neon-red)";
+                descEl.innerText = '"You have discovered approximately 2% of the lore."';
+            } else if (score <= 6) {
+                titleEl.innerText = "CASUAL LORE ENJOYER 😭";
+                titleEl.style.color = "#ffaa00";
+                descEl.innerText = '"You know something… but not enough."';
+            } else if (score <= 8) {
+                titleEl.innerText = "ANH QUY FAN 🔥";
+                titleEl.style.color = "var(--neon-blue)";
+                descEl.innerText = '"Okay, you actually know your stuff."';
+            } else if (score === 9) {
+                titleEl.innerText = "ANH QUY SCHOLAR 🗿";
+                titleEl.style.color = "var(--neon-pink)";
+                descEl.innerText = '"The lore has been studied."';
+            } else {
+                titleEl.innerText = "ULTIMATE LORE MASTER 🏆🔥";
+                titleEl.style.color = "var(--neon-green)";
+                descEl.innerText = '"You know EVERYTHING."';
+            }
+            
+            document.getElementById('lore-sections').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- EFFECTS UTILITIES ---
+        function fireParticles(amount = 20, colors = ['#00f3ff', '#ff00ff']) {
+            for (let i = 0; i < amount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.width = (Math.random() * 8 + 4) + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.top = '-10px';
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                particle.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 4000);
+            }
+        }
+
+        function fireEmojis(emojiArray, amount = 10) {
+            for (let i = 0; i < amount; i++) {
+                const emoji = document.createElement('div');
+                emoji.className = 'falling-emoji';
+                emoji.innerText = emojiArray[Math.floor(Math.random() * emojiArray.length)];
+                emoji.style.left = Math.random() * 100 + 'vw';
+                emoji.style.top = '-50px';
+                emoji.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                document.body.appendChild(emoji);
+                setTimeout(() => emoji.remove(), 4000);
+            }
+        }
+
+        function showFlyingText(text) {
+            const el = document.createElement('div');
+            el.className = 'flying-text';
+            el.innerText = text;
+            el.style.left = (Math.random() * 20 + 10) + 'vw';
+            el.style.top = (Math.random() * 50 + 20) + 'vh';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1000);
+        }
+    </script>
+</body>
+</html>
